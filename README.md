@@ -43,19 +43,7 @@ Applikationerne kan for eksempel bruge
 applikation med en gennemgået ændring af afhængigheden, og kør dens
 integrationstests mod det aftalte databaseskema inden udrulning.
 
-## Udgivelser og databaseændringer
-
-Pakkens første version er `1.0.0`. Følg semantisk versionering: Hæv
-hovedversionen ved inkompatible ændringer af modellen eller databasekontrakten,
-underversionen ved bagudkompatible tilføjelser og rettelsesversionen ved
-bagudkompatible fejlrettelser. Byg en wheel med
-`python -m pip wheel . --no-deps`, og test med
-`python -m unittest discover -s tests`. Et udgivelsestag kan markere det
-testede commit, men det er ikke nødvendigt for installation fra Git. Flyt
-aldrig et udgivelsestag. Den nuværende
-`.github/workflows/publish-to-pypi.yml` udgiver automatisk tags som `v1.0.0`
-til PyPI; deaktivér eller fjern workflowet, inden sådanne tags oprettes, hvis
-pakken ikke skal udgives der.
+## Databaseændringer
 
 Modellerne migrerer ikke databasen. Opbevar Alembic-migrationer i det projekt,
 der ejer databasen, koordinér migrationer og udrulning af applikationer med
