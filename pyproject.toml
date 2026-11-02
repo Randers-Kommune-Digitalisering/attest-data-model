@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "attest-data-model"
+version = "1.0.0"
+description = "Shared SQLAlchemy data model for attestation applications"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["SQLAlchemy>=2.0,<3"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
