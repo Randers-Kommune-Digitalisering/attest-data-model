@@ -214,7 +214,7 @@ class OrderEvent(Base):
     rejection_description = Column(String(255))
     status = Column(OrderStatusType, nullable=False)
     occurred_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    actor = Column(String(50), nullable=False)
+    actor = Column(String(255), nullable=False)
     order = relationship("AttestationOrder", back_populates="events")
 
 
