@@ -4,8 +4,8 @@ import enum
 import uuid
 
 from sqlalchemy import (BigInteger, Boolean, CheckConstraint, Column, DateTime,
-                        Enum, ForeignKey, Index, Integer, String,
-                        UniqueConstraint, func, text)
+                        Enum, ForeignKey, Index, Integer, String, UniqueConstraint,
+                        func, text)
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -52,6 +52,21 @@ RecordOutcomeType = Enum(
     native_enum=False,
     create_constraint=True,
     length=32,
+    values_callable=lambda members: [member.value for member in members],
+)
+
+
+class ForwardStatus(str, enum.Enum):
+    PENDING = "pending"
+    SENT = "sent"
+
+
+ForwardStatusType = Enum(
+    ForwardStatus,
+    name="forward_status",
+    native_enum=False,
+    create_constraint=True,
+    length=16,
     values_callable=lambda members: [member.value for member in members],
 )
 
@@ -174,7 +189,8 @@ class ReceivedRecord(Base):
     record_id = Column(String(36), primary_key=True, default=_new_uuid)
     # Nullable so unmatched records can be stored and matched manually.
     order_id = Column(String(36), ForeignKey("attestation_order.order_id", ondelete="RESTRICT"), unique=True)
-    external_ref = Column(String(255))
+    is_clean = Column(Boolean, nullable=True)
+    mail_uid = Column(String(36), nullable=False, unique=True)
     received_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     # NULL until the record has been processed.
     outcome = Column(RecordOutcomeType, index=True)
@@ -184,6 +200,8 @@ class ReceivedRecord(Base):
     sbsys_sags_id = Column(Integer)
     sbsys_document_id = Column(String(50))
     order = relationship("AttestationOrder", back_populates="received_record")
+    forward_recipient = Column(String(255))
+    forward_status = Column(ForwardStatusType, index=True)
 
 
 class OrderEvent(Base):
@@ -192,11 +210,11 @@ class OrderEvent(Base):
     __tablename__ = "order_event"
     event_id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
     order_id = Column(String(36), ForeignKey("attestation_order.order_id", ondelete="CASCADE"), nullable=False, index=True)
+    rejection_reason = Column(String(255))
+    rejection_description = Column(String(255))
     status = Column(OrderStatusType, nullable=False)
     occurred_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     actor = Column(String(50), nullable=False)
-    rejection_reason = Column(String(50))
-    rejection_description = Column(String)
     order = relationship("AttestationOrder", back_populates="events")
 
 
